@@ -1,8 +1,9 @@
 from traffic_data.load import load_traffic_data_city, load_tile_geo_data_city 
 from traffic_data.enums import City, Service, TrafficType
-from datetime import date
+from datetime import date, time
+from aggregate_night_traffic import get_night_traffic_city_by_tile_service_time
 
-if __name__ == '__main__':
+def test_load_traffic():
     td = load_traffic_data_city(traffic_type=TrafficType.UL_AND_DL, city=City.BORDEAUX, service=[Service.WIKIPEDIA], day=[date(2019, 4, 3)])
     geo = load_tile_geo_data_city(city=City.BORDEAUX)
     print('TRAFFIC DATA')
@@ -17,3 +18,21 @@ if __name__ == '__main__':
     print(geo.shape)
     print(geo.columns)
 
+
+def test_aggregate_night_traffic():
+    city = City.BORDEAUX
+    traffic_type = TrafficType.UL_AND_DL
+    start_night = time(22)
+    end_night = time(5)
+    service = [Service.WIKIPEDIA, Service.TWITCH]
+    remove_nights_before_holiday_and_anomalies = True
+
+    night_traffic = get_night_traffic_city_by_tile_service_time(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
+    print('NIGHT TRAFFIC DATA')
+    print(night_traffic.dims)
+    print(night_traffic.shape)
+    print(night_traffic.coords)
+    print(night_traffic.head())
+
+if __name__ == '__main__':
+    test_load_traffic()
