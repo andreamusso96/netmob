@@ -10,7 +10,7 @@ import numpy as np
 import geopandas as gpd
 
 from .enums import City, Service, TrafficType, TimeOptions
-from config import DATA_DIR
+from config import TRAFFIC_DATA_DIR
 
 
 def load_traffic_data_city(traffic_type: TrafficType, city: City, service: List[Service], day: List[date]) -> xr.DataArray:
@@ -69,11 +69,11 @@ def load_tile_geo_data_city(city: City):
 
 def get_mobile_traffic_data_file_path(traffic_type: TrafficType, city: City, service: Service, day: date):
     day_str = day.strftime('%Y%m%d')
-    path = f'{DATA_DIR}/traffic/{city.value}/{service.value}/{day_str}/'
+    path = f'{TRAFFIC_DATA_DIR}/traffic/{city.value}/{service.value}/{day_str}/'
     file_name = f'{city.value}_{service.value}_{day_str}_{traffic_type.value}.txt'
     file_path = path + file_name
     return file_path
 
 
 def get_geo_data_file_path(city: City) -> str:
-    return f'{DATA_DIR}/tile_geo/{city.value}.geojson'
+    return f'{TRAFFIC_DATA_DIR}/tile_geo/{city.value}.geojson'
