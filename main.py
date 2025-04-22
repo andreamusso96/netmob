@@ -163,7 +163,7 @@ def run_job():
     logger.info('Saving zonal statistics to %s', zonal_stats_output_file_path)
     zonal_stats.to_parquet(zonal_stats_output_file_path, index=False)
     logger.info('Zonal statistics saved to %s', zonal_stats_output_file_path)
-    logger.info('Zonal statistics job finished')
+    logger.info('@@ Zonal statistics job finished @@')
 
 if __name__ == '__main__':
     run_job()

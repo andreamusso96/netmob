@@ -46,13 +46,13 @@ def convert_minutes(minutes):
 def run_cluster_jobs():
     ntasks = 1
     script_file_path = '/cluster/home/anmusso/Projects/NetMobV2/netmob/main.py'
-    cities = [City.DIJON]  #[c for c in City]
-    services = [Service.WIKIPEDIA] #[s for s in Service]
+    cities = [c for c in City]
+    services = [s for s in Service]
 
     for c in cities:
         for s in services:
             logger.info(f"Submitting job for city {c.value} and service {s.value}")
-            sbatch_output_file = f"slurm-aggr-{c.value}-{s.value}%j.out"
+            sbatch_output_file = f"slurm-aggr-{c.value.lower()}-{s.value.lower()}-%j.out"
             run_time, mem_per_cpu = get_city_runtime_and_mem(c=c)
             cmd_args = [c.value, s.value]
             cmd = f"sbatch --time={run_time} --mem-per-cpu={mem_per_cpu} --ntasks={ntasks} --output={sbatch_output_file} --error={sbatch_output_file} --wrap='python {script_file_path} {' '.join(cmd_args)}'"
