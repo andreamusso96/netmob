@@ -7,7 +7,7 @@ from zonal_statistics import compute_zonal_statistics_traffic_raster_city_servic
 import plotly.express as px
 import geopandas as gpd
 from memory_profiler import profile
-import time
+from time import time as time_profiling
 
 
 def test_load_traffic():
@@ -111,14 +111,14 @@ def speed_and_memory_test():
     zonal_stats_ouput_file_path = '/cluster/home/anmusso/Projects/NetMobV2/netmob/zonal_stats_speed_test.parquet'
 
     print('Starting speed and memory test test')
-    time_start = time.time()
+    time_start = time_profiling.time()
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
     raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
     vectors = gpd.read_parquet(vector_file_path)
     zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
     zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
     print('Zonal statistics saved to', zonal_stats_ouput_file_path)
-    time_end = time.time()
+    time_end = time_profiling.time()
     print('Time taken:', time_end - time_start, 'seconds')
     print('Speed and memory test finished')
 
