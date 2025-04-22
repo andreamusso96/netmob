@@ -43,7 +43,7 @@ def get_night_traffic_city_by_tile_service_time(city: City, traffic_type: Traffi
 
 
 def day_time_to_datetime_index(xar: xr.DataArray) -> xr.DataArray:
-    new_index = np.add.outer(xar.indexes['dat'], xar.indexes['time']).flatten()
+    new_index = np.add.outer(xar.indexes['day'], xar.indexes['time']).flatten()
     datetime_xar = xar.stack(datetime=('day', 'time'), create_index=False)
     datetime_xar = datetime_xar.reindex({'datetime': new_index})
     return datetime_xar

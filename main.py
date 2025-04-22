@@ -35,4 +35,4 @@ def test_aggregate_night_traffic():
     print(night_traffic.head())
 
 if __name__ == '__main__':
-    test_load_traffic()
+    test_aggregate_night_traffic()
