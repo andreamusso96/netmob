@@ -6,6 +6,9 @@ from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
 from zonal_statistics import compute_zonal_statistics_traffic_raster_city_service
 import plotly.express as px
 import geopandas as gpd
+from memory_profiler import profile
+import time
+
 
 def test_load_traffic():
     td = load_traffic_data_city(traffic_type=TrafficType.UL_AND_DL, city=City.BORDEAUX, service=[Service.WIKIPEDIA], day=[date(2019, 4, 3)])
@@ -93,6 +96,31 @@ def test_zonal_statistics():
     print('ZONAL STATISTICS')
     print(zonal_stats.head())
 
+
+@profile
+def speed_and_memory_test():
+    city = City.PARIS
+    traffic_type = TrafficType.UL_AND_DL
+    start_night = time(22)
+    end_night = time(6)
+    service = Service.FACEBOOK
+    remove_nights_before_holiday_and_anomalies = True
+    vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
+    vector_id_col = 'Idcar_200m'
+    coverage_threshold = 0.8
+    zonal_stats_ouput_file_path = '/cluster/home/anmusso/Projects/NetMobV2/netmob/zonal_stats_speed_test.parquet'
+
+    print('Starting speed and memory test test')
+    time_start = time.time()
+    night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
+    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
+    vectors = gpd.read_parquet(vector_file_path)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
+    print('Zonal statistics saved to', zonal_stats_ouput_file_path)
+    time_end = time.time()
+    print('Time taken:', time_end - time_start, 'seconds')
+    print('Speed and memory test finished')
 
 if __name__ == '__main__':
     test_zonal_statistics()
