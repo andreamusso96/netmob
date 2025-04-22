@@ -89,7 +89,7 @@ def test_zonal_statistics():
     vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vectors = gpd.read_parquet(vector_file_path)
 
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col='tile', coverage_threshold=0.8)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col='Idcar_200m', coverage_threshold=0.8)
     print('ZONAL STATISTICS')
     print(zonal_stats.head())
 
