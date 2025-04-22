@@ -1,0 +1,112 @@
+from enum import Enum
+from datetime import timedelta
+
+import pandas as pd
+
+
+class TimeOptions:
+    @staticmethod
+    def get_times():
+        return pd.timedelta_range(start='00:00:00', end='23:59:00', freq='15min')
+
+    @staticmethod
+    def get_days():
+        return pd.date_range(start='2019-03-16', end='2019-05-31', freq='D')
+
+
+class City(Enum):
+    BORDEAUX = 'Bordeaux'
+    CLERMONT_FERRAND = 'Clermont-Ferrand'
+    DIJON = 'Dijon'
+    GRENOBLE = 'Grenoble'
+    LILLE = 'Lille'
+    LYON = 'Lyon'
+    MANS = 'Mans'  
+    MARSEILLE = 'Marseille'
+    METZ = 'Metz'
+    MONTPELLIER = 'Montpellier'
+    NANCY = 'Nancy'
+    NANTES = 'Nantes'
+    NICE = 'Nice'
+    ORLEANS = 'Orleans'  
+    PARIS = 'Paris'
+    RENNES = 'Rennes'
+    SAINT_ETIENNE = 'Saint-Etienne'  
+    STRASBOURG = 'Strasbourg'
+    TOULOUSE = 'Toulouse'
+    TOURS = 'Tours'
+
+class TrafficType(Enum):
+    DL = 'DL'
+    UL = 'UL'
+    UL_AND_DL = 'UL_AND_DL'
+
+class Service(Enum):
+    TWITCH = 'Twitch'
+    ORANGE_TV = 'Orange_TV'
+    MICROSOFT_AZURE = 'Microsoft_Azure'
+    APPLE_ICLOUD = 'Apple_iCloud'
+    WEB_GAMES = 'Web_Games'
+    PLAYSTATION = 'PlayStation'
+    TEAMVIEWER = 'TeamViewer'
+    WEB_WEATHER = 'Web_Weather'
+    GOOGLE_MEET = 'Google_Meet'
+    TWITTER = 'Twitter'
+    AMAZON_WEB_SERVICES = 'Amazon_Web_Services'
+    APPLE_MUSIC = 'Apple_Music'
+    APPLE_SIRI = 'Apple_Siri'
+    WEB_ADS = 'Web_Ads'
+    SOUNDCLOUD = 'SoundCloud'
+    WIKIPEDIA = 'Wikipedia'
+    MICROSOFT_SKYDRIVE = 'Microsoft_Skydrive'
+    WEB_TRANSPORTATION = 'Web_Transportation'
+    MICROSOFT_OFFICE = 'Microsoft_Office'
+    YAHOO_MAIL = 'Yahoo_Mail'
+    WEB_FOOD = 'Web_Food'
+    WHATSAPP = 'WhatsApp'
+    GOOGLE_MAIL = 'Google_Mail'
+    YOUTUBE = 'YouTube'
+    UBER = 'Uber'
+    PINTEREST = 'Pinterest'
+    WEB_CLOTHES = 'Web_Clothes'
+    DROPBOX = 'Dropbox'
+    APPLE_MAIL = 'Apple_Mail'
+    WEB_ADULT = 'Web_Adult'
+    DAILYMOTION = 'DailyMotion'
+    INSTAGRAM = 'Instagram'
+    SKYPE = 'Skype'
+    CLASH_OF_CLANS = 'Clash_of_Clans'
+    POKEMON_GO = 'Pokemon_GO'
+    APPLE_APP_STORE = 'Apple_App_Store'
+    GOOGLE_DRIVE = 'Google_Drive'
+    APPLE_WEB_SERVICES = 'Apple_Web_Services'
+    APPLE_ITUNES = 'Apple_iTunes'
+    WEB_FINANCE = 'Web_Finance'
+    FACEBOOK_LIVE = 'Facebook_Live'
+    WEB_DOWNLOADS = 'Web_Downloads'
+    EA_GAMES = 'EA_Games'
+    WAZE = 'Waze'
+    GOOGLE_DOCS = 'Google_Docs'
+    APPLE_VIDEO = 'Apple_Video'
+    LINKEDIN = 'LinkedIn'
+    FACEBOOK_MESSENGER = 'Facebook_Messenger'
+    SNAPCHAT = 'Snapchat'
+    DEEZER = 'Deezer'
+    NETFLIX = 'Netflix'
+    FACEBOOK = 'Facebook'
+    TELEGRAM = 'Telegram'
+    APPLE_IMESSAGE = 'Apple_iMessage'
+    MICROSOFT_STORE = 'Microsoft_Store'
+    MOLOTOV = 'Molotov'
+    GOOGLE_MAPS = 'Google_Maps'
+    TOR = 'Tor'
+    GOOGLE_PLAY_STORE = 'Google_Play_Store'
+    WEB_E_COMMERCE = 'Web_e-Commerce'
+    FORTNITE = 'Fortnite'
+    MICROSOFT_MAIL = 'Microsoft_Mail'
+    PERISCOPE = 'Periscope'
+    GOOGLE_WEB_SERVICES = 'Google_Web_Services'
+    SPOTIFY = 'Spotify'
+    MICROSOFT_WEB_SERVICES = 'Microsoft_Web_Services'
+    WEB_STREAMING = 'Web_Streaming'
+    YAHOO = 'Yahoo'

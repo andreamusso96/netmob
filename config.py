@@ -1,0 +1,1 @@
+DATA_DIR = '/cluster/project/coss/anmusso/data/netmob'
