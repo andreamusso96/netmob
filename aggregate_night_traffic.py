@@ -21,25 +21,22 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 
-def get_night_traffic_city_by_tile_service_time(city: City, traffic_type: TrafficType, start_night: time, end_night: time, service: List[Service], remove_nights_before_holiday_and_anomalies: bool = True) -> xr.DataArray:
-    traffic_data_city = []
-    for i in range(0, len(service), 2):
-        service_ = service[i:i + 2]
-        logger.info(f"Loading traffic data for {city} {service_}")
-        traffic_data_service = load_traffic_data_city(traffic_type=traffic_type, city=city, service=service_, day=TimeOptions.get_days())
-        traffic_data_service = day_time_to_datetime_index(xar=traffic_data_service)
-        if remove_nights_before_holiday_and_anomalies:
-            traffic_data_service = remove_nights_before_holidays(traffic_data=traffic_data_service)
-            traffic_data_service = remove_nights_before_anomalies(traffic_data=traffic_data_service, city=city)
+def get_night_traffic_city_service(city: City, service: Service, traffic_type: TrafficType, start_night: time, end_night: time, remove_nights_before_holiday_and_anomalies: bool = True) -> pd.DataFrame:
+    logger.info(f"Loading traffic data for {city} {service}")
 
-        traffic_data_service = remove_times_outside_range(traffic_data=traffic_data_service, start=start_night, end=end_night)
-        traffic_data_service = traffic_data_service.groupby(group=f'datetime.time').sum()
-        sorted_time_index = _sort_time_index(time_index=traffic_data_service.time.values, reference_time=start_night)
-        traffic_data_service = traffic_data_service.reindex({'time': sorted_time_index})
-        traffic_data_city.append(traffic_data_service)
+    traffic_data_service = load_traffic_data_city(traffic_type=traffic_type, city=city, service=[service], day=TimeOptions.get_days())
+    traffic_data_service = day_time_to_datetime_index(xar=traffic_data_service)
 
-    traffic_data_city = xr.concat(traffic_data_city, dim='service')
-    return traffic_data_city
+    if remove_nights_before_holiday_and_anomalies:
+        traffic_data_service = remove_nights_before_holidays(traffic_data=traffic_data_service)
+        traffic_data_service = remove_nights_before_anomalies(traffic_data=traffic_data_service, city=city)
+
+    traffic_data_service = remove_times_outside_range(traffic_data=traffic_data_service, start=start_night, end=end_night)
+    traffic_data_service = traffic_data_service.groupby(group=f'datetime.time').sum()
+    sorted_time_index = _sort_time_index(time_index=traffic_data_service.time.values, reference_time=start_night)
+    traffic_data_service = traffic_data_service.reindex({'time': sorted_time_index})
+    traffic_data_service = traffic_data_service.squeeze('service').to_pandas()
+    return traffic_data_service
 
 
 def day_time_to_datetime_index(xar: xr.DataArray) -> xr.DataArray:
