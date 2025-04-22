@@ -14,7 +14,7 @@ import pandas as pd
 
 
 from traffic_data.enums import City
-import traffic_data.load as load_tile_geo_data_city
+from traffic_data.load import load_tile_geo_data_city
 
 
 def rasterize_points(gdf: gpd.GeoDataFrame, measurements: List[str], tile_size: float, no_data: float, epsg: int) -> xr.DataArray:
