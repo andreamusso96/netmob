@@ -36,6 +36,7 @@ def get_night_traffic_city_service(city: City, service: Service, traffic_type: T
     sorted_time_index = _sort_time_index(time_index=traffic_data_service.time.values, reference_time=start_night)
     traffic_data_service = traffic_data_service.reindex({'time': sorted_time_index})
     traffic_data_service = traffic_data_service.squeeze('service').to_pandas()
+    traffic_data_service = traffic_data_service.rename(columns={t: t.strftime('%H:%M:%S') for t in traffic_data_service.columns})
     return traffic_data_service
 
 

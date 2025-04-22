@@ -46,10 +46,7 @@ def test_rasterize_traffic():
 
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
 
-    time_as_str = [str(t) for t in night_traffic.time.values]
-    night_traffic = night_traffic.assign_coords(time=time_as_str)
-
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic.squeeze().to_pandas(), city=city)
+    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
     print('RASTER DATA')
     print(raster.dims)
     print(raster.shape)
