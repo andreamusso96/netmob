@@ -3,6 +3,7 @@ from traffic_data.enums import City, Service, TrafficType
 from datetime import date, time
 from aggregate_night_traffic import get_night_traffic_city_service
 from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
+import plotly.express as px
 
 def test_load_traffic():
     td = load_traffic_data_city(traffic_type=TrafficType.UL_AND_DL, city=City.BORDEAUX, service=[Service.WIKIPEDIA], day=[date(2019, 4, 3)])
@@ -53,6 +54,15 @@ def test_rasterize_traffic():
     print(raster.coords)
     print(raster.head())
     print('RASTER DATA')
+
+    raster_2230 = raster.sel(time="22:30:00")
+    raster_2230_pd = raster_2230.squeeze().to_pandas()
+    fig = px.imshow(raster_2230_pd, color_continuous_scale='Viridis', title="Traffic Service and Geo Test", labels={'value': 'Value'}, width=800, height=600,  origin='lower')
+    fig.show()
+
+
+
+
 
 
 if __name__ == '__main__':
