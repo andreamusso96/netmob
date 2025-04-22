@@ -5,6 +5,7 @@ from aggregate_night_traffic import get_night_traffic_city_service
 from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
 from zonal_statistics import compute_zonal_statistics_traffic_raster_city_service
 import plotly.express as px
+import geopandas as gpd
 
 def test_load_traffic():
     td = load_traffic_data_city(traffic_type=TrafficType.UL_AND_DL, city=City.BORDEAUX, service=[Service.WIKIPEDIA], day=[date(2019, 4, 3)])
@@ -23,7 +24,7 @@ def test_load_traffic():
 
 
 def test_aggregate_night_traffic():
-    city = City.BORDEAUX
+    city = City.DIJON
     traffic_type = TrafficType.UL_AND_DL
     start_night = time(22)
     end_night = time(5)
@@ -39,7 +40,7 @@ def test_aggregate_night_traffic():
 
 def test_rasterize_traffic():
 
-    city = City.BORDEAUX
+    city = City.DIJON
     traffic_type = TrafficType.UL_AND_DL
     start_night = time(22)
     end_night = time(5)
@@ -63,7 +64,7 @@ def test_rasterize_traffic():
 
 
 def test_zonal_statistics():
-    city = City.BORDEAUX
+    city = City.DIJON
     traffic_type = TrafficType.UL_AND_DL
     start_night = time(22)
     end_night = time(5)
@@ -85,7 +86,10 @@ def test_zonal_statistics():
     fig = px.imshow(raster_2230_pd, color_continuous_scale='Viridis', title="Traffic Service and Geo Test", labels={'value': 'Value'}, width=800, height=600,  origin='lower')
     fig.show()
 
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=night_traffic, vector_id_col='tile', coverage_threshold=0.8)
+    vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
+    vectors = gpd.read_parquet(vector_file_path)
+
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col='tile', coverage_threshold=0.8)
     print('ZONAL STATISTICS')
     print(zonal_stats.head())
 
