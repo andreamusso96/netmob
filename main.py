@@ -4,6 +4,7 @@ from datetime import date, time, datetime
 from aggregate_night_traffic import get_night_traffic_city_service
 from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
 from zonal_statistics import compute_zonal_statistics_traffic_raster_city_service
+from copy_data_to_duckdb import copy_data_to_duckdb
 import plotly.express as px
 import geopandas as gpd
 from memory_profiler import profile
@@ -166,4 +167,4 @@ def run_job():
     logger.info('@@ Zonal statistics job finished @@')
 
 if __name__ == '__main__':
-    run_job()
+    copy_data_to_duckdb()
