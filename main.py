@@ -2,6 +2,7 @@ from traffic_data.load import load_traffic_data_city, load_tile_geo_data_city
 from traffic_data.enums import City, Service, TrafficType
 from datetime import date, time, datetime
 from aggregate_night_traffic import get_night_traffic_city_service
+from aggregate_traffic_to_hours import get_traffic_city_service_hour
 from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
 from zonal_statistics import compute_zonal_statistics_traffic_raster_city_service
 from copy_data_to_duckdb import copy_data_to_duckdb
@@ -166,5 +167,66 @@ def run_job():
     logger.info('Zonal statistics saved to %s', zonal_stats_output_file_path)
     logger.info('@@ Zonal statistics job finished @@')
 
+@profile
+def speed_and_memory_test_full_day():
+    city = City.PARIS
+    traffic_type = TrafficType.UL_AND_DL
+    service = Service.FACEBOOK
+    vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
+    vector_id_col = 'Idcar_200m'
+    coverage_threshold = 0.8
+    zonal_stats_ouput_file_path = '/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/speed_and_memory_test/zonal_stats_speed_test_full_day.parquet'
+
+    print('Starting speed and memory test test')
+    time_start = time_profiling.time()
+    traffic_data = get_traffic_city_service_hour(city=city, service=service, traffic_type=traffic_type)
+    print('Traffic data loaded')
+    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=traffic_data, city=city)
+    print('Raster data created')
+    vectors = gpd.read_parquet(vector_file_path)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
+    print('Zonal statistics saved to', zonal_stats_ouput_file_path)
+    time_end = time_profiling.time()
+    print('Time taken:', time_end - time_start, 'seconds')
+    print('Speed and memory test finished')
+
+
+def run_job_full_day():
+    city = City(sys.argv[1])
+    service = Service(sys.argv[2])
+    traffic_type = TrafficType.UL_AND_DL
+
+    vector_file_path = INSEE_TILE_GEO_DATA_FILE
+    vector_id_col = 'Idcar_200m'
+    coverage_threshold = 0.8
+    zonal_stats_output_file_path = f'/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/insee_tile_v2/zonal_stats_{city.value}_{service.value}.parquet'
+
+    logger = logging.getLogger(f'Logger_full_day_{city.value}_{service.value}')
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    logger.info('Starting zonal statistics job for city %s and service %s', city.value, service.value)
+    logger.info('Loading traffic data')
+    traffic_data = get_traffic_city_service_hour(city=city, service=service, traffic_type=traffic_type)
+    logger.info('Traffic data loaded')
+    logger.info('Rasterizing traffic data')
+    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=traffic_data, city=city)
+    logger.info('Raster data created')
+    logger.info('Zonal statistics computation started')
+    vectors = gpd.read_parquet(vector_file_path)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    logger.info('Zonal statistics computation finished')
+    logger.info('Saving zonal statistics to %s', zonal_stats_output_file_path)
+    zonal_stats.to_parquet(zonal_stats_output_file_path, index=False)
+    logger.info('Zonal statistics saved to %s', zonal_stats_output_file_path)
+    logger.info('@@ Zonal statistics job finished @@')
+
+
 if __name__ == '__main__':
-    copy_data_to_duckdb()
+    with open("/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/speed_and_memory_test/mem_profile.txt", "w") as f:
+        profiled = profile(stream=f)(speed_and_memory_test_full_day)
+        profiled()
