@@ -227,7 +227,4 @@ def run_job_full_day():
 
 
 if __name__ == '__main__':
-    now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-    with open(f"/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/speed_and_memory_test/mem_profile_{now}.txt", "w") as f:
-        profiled = profile(stream=f)(speed_and_memory_test_full_day)
-        profiled()
+    run_job_full_day()

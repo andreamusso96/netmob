@@ -19,8 +19,8 @@ def get_city_runtime_and_mem(c: City):
     # This function estimates the runtime and memory requirements for a job based on the city.
     # The values are based on the Paris city as a reference which was evaluated by testing on Paris and Facebook. 
 
-    paris_time = 7400
-    paris_mem = 18500
+    paris_time = 15800
+    paris_mem = 15000
     paris_dims = CityDimensions.get_city_dim(city=City.PARIS)
     paris_dim = paris_dims[0] * paris_dims[1]
 
