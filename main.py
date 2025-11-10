@@ -169,9 +169,9 @@ def run_job():
 
 @profile
 def speed_and_memory_test_full_day():
-    city = City.PARIS
+    city = City.DIJON
     traffic_type = TrafficType.UL_AND_DL
-    service = Service.FACEBOOK
+    service = Service.WIKIPEDIA
     vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vector_id_col = 'Idcar_200m'
     coverage_threshold = 0.8
