@@ -118,7 +118,7 @@ def speed_and_memory_test():
     print('Starting speed and memory test test')
     time_start = time_profiling.time()
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
-    print('Night traffic data loaded')
+    print('Traffic data loaded')
     raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
     print('Raster data created')
     vectors = gpd.read_parquet(vector_file_path)
@@ -169,9 +169,9 @@ def run_job():
 
 @profile
 def speed_and_memory_test_full_day():
-    city = City.DIJON
+    city = City.PARIS
     traffic_type = TrafficType.UL_AND_DL
-    service = Service.WIKIPEDIA
+    service = Service.FACEBOOK
     vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vector_id_col = 'Idcar_200m'
     coverage_threshold = 0.8
@@ -227,6 +227,7 @@ def run_job_full_day():
 
 
 if __name__ == '__main__':
-    with open("/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/speed_and_memory_test/mem_profile.txt", "w") as f:
+    now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
+    with open(f"/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/speed_and_memory_test/mem_profile_{now}.txt", "w") as f:
         profiled = profile(stream=f)(speed_and_memory_test_full_day)
         profiled()
