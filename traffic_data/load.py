@@ -12,8 +12,6 @@ import geopandas as gpd
 from .enums import City, Service, TrafficType, TimeOptions
 from config import TRAFFIC_DATA_DIR
 
-TRAFFIC_DATA_DIR = '/Users/andrea/Desktop/PhD/Projects/Current/NetMob/netmob/test_data'
-
 
 def load_traffic_data_city(traffic_type: TrafficType, city: City, service: List[Service], day: List[date]) -> xr.DataArray:
     tuples = list(itertools.product(service, day))

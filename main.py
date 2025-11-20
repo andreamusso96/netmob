@@ -13,6 +13,7 @@ import time as time_profiling
 import sys
 from config import INSEE_TILE_GEO_DATA_FILE
 import logging
+from aggregate_traffic_to_days import get_traffic_city_service_date
 
 
 def test_load_traffic():
@@ -228,7 +229,28 @@ def run_job_tile_by_time_full_day():
 
 @profile
 def speed_and_memory_service_by_day():
-    
+    from config import INSEE_TILE_GEO_DATA_FILE
+    city = City.DIJON
+    traffic_type = TrafficType.UL_AND_DL
+    service = Service.WIKIPEDIA
+    vector_file_path = INSEE_TILE_GEO_DATA_FILE
+    vector_id_col = 'Idcar_200m'
+    coverage_threshold = 0.8
+    zonal_stats_ouput_file_path = '/Users/andrea/Desktop/PhD/Projects/Current/NetMob/netmob/test_data/zonal_stats/zonal_stats_speed_test_service_by_day.parquet'
+
+    print('Starting speed and memory test test')
+    time_start = time_profiling.time()
+    traffic_data = get_traffic_city_service_date(city=city, service=service, traffic_type=traffic_type)
+    print('Traffic data loaded')
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=traffic_data, city=city, z_dim='date')
+    print('Raster data created')
+    vectors = gpd.read_parquet(vector_file_path)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='date')
+    zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
+    print('Zonal statistics saved to', zonal_stats_ouput_file_path)
+    time_end = time_profiling.time()
+    print('Time taken:', time_end - time_start, 'seconds')
+    print('Speed and memory test finished')
 
 
 
