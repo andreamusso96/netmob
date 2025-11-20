@@ -42,7 +42,7 @@ def get_city_runtime_and_mem_v2(c: City):
     time_precise = 0.04 * n_tiles
     mem_precise = 512 + (0.24 * n_tiles)
     time = int(np.ceil(1.5 * time_precise / 60)) # in minutes
-    mem = int(np.ceil(1.5 * mem_precise)) # in MB
+    mem = int(np.ceil(1.2 * mem_precise)) # in MB
     return time, mem
 
 def convert_minutes(minutes):
