@@ -37,7 +37,8 @@ def get_city_runtime_and_mem(c: City):
     return city_time_str, city_mem
 
 def get_city_runtime_and_mem_v2(c: City):
-    n_tiles = CityDimensions.get_city_dim(city=c)
+    dims = CityDimensions.get_city_dim(city=c)
+    n_tiles = dims[0] * dims[1]
     time_precise = 0.04 * n_tiles
     mem_precise = 512 + (0.24 * n_tiles)
     time = int(np.ceil(1.5 * time_precise / 60)) # in minutes
