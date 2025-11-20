@@ -72,4 +72,4 @@ def run_cluster_jobs():
 
 
 if __name__ == '__main__':
-    print(get_city_runtime_and_mem_v2(c=City.PARIS))
+    run_cluster_jobs()
