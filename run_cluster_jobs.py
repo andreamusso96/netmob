@@ -20,7 +20,7 @@ def get_city_runtime_and_mem(c: City):
     # The values are based on the Paris city as a reference which was evaluated by testing on Paris and Facebook. 
 
     paris_time = 15800
-    paris_mem = 2 * 15000
+    paris_mem = 18000
     paris_dims = CityDimensions.get_city_dim(city=City.PARIS)
     paris_dim = paris_dims[0] * paris_dims[1]
 

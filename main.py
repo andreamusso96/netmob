@@ -3,7 +3,7 @@ from traffic_data.enums import City, Service, TrafficType
 from datetime import date, time, datetime
 from aggregate_night_traffic import get_night_traffic_city_service
 from aggregate_traffic_to_hours import get_traffic_city_service_hour
-from rasterize_traffic import rasterize_traffic_city_service_by_tile_time
+from rasterize_traffic import rasterize_traffic_city_service_by_tile
 from zonal_statistics import compute_zonal_statistics_traffic_raster_city_service
 from copy_data_to_duckdb import copy_data_to_duckdb
 import plotly.express as px
@@ -57,7 +57,7 @@ def test_rasterize_traffic():
 
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
 
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=night_traffic, city=city, z_dim='time')
     print('RASTER DATA')
     print(raster.dims)
     print(raster.shape)
@@ -81,7 +81,7 @@ def test_zonal_statistics():
 
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
 
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=night_traffic, city=city, z_dim='time')
     print('RASTER DATA')
     print(raster.dims)
     print(raster.shape)
@@ -97,13 +97,13 @@ def test_zonal_statistics():
     vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vectors = gpd.read_parquet(vector_file_path)
 
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col='Idcar_200m', coverage_threshold=0.8)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col='Idcar_200m', coverage_threshold=0.8, z_dim='time')
     print('ZONAL STATISTICS')
     print(zonal_stats.head())
 
 
 @profile
-def speed_and_memory_test():
+def speed_and_memory_test_tile_by_time_night():
     city = City.PARIS
     traffic_type = TrafficType.UL_AND_DL
     start_night = time(22)
@@ -119,10 +119,10 @@ def speed_and_memory_test():
     time_start = time_profiling.time()
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
     print('Traffic data loaded')
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=night_traffic, city=city, z_dim='time')
     print('Raster data created')
     vectors = gpd.read_parquet(vector_file_path)
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='time')
     zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
     print('Zonal statistics saved to', zonal_stats_ouput_file_path)
     time_end = time_profiling.time()
@@ -130,7 +130,7 @@ def speed_and_memory_test():
     print('Speed and memory test finished')
 
 
-def run_job():
+def run_job_tile_by_time_night():
     city = City(sys.argv[1])
     service = Service(sys.argv[2])
 
@@ -156,11 +156,11 @@ def run_job():
     night_traffic = get_night_traffic_city_service(city=city, traffic_type=traffic_type, start_night=start_night, end_night=end_night, service=service, remove_nights_before_holiday_and_anomalies=remove_nights_before_holiday_and_anomalies)
     logger.info('Night traffic data loaded')
     logger.info('Rasterizing traffic data')
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=night_traffic, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=night_traffic, city=city, z_dim='time')
     logger.info('Raster data created')
     logger.info('Zonal statistics computation started')
     vectors = gpd.read_parquet(vector_file_path)
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='time')
     logger.info('Zonal statistics computation finished')
     logger.info('Saving zonal statistics to %s', zonal_stats_output_file_path)
     zonal_stats.to_parquet(zonal_stats_output_file_path, index=False)
@@ -168,7 +168,7 @@ def run_job():
     logger.info('@@ Zonal statistics job finished @@')
 
 @profile
-def speed_and_memory_test_full_day():
+def speed_and_memory_test_tile_by_time_full_day():
     city = City.PARIS
     traffic_type = TrafficType.UL_AND_DL
     service = Service.FACEBOOK
@@ -181,10 +181,10 @@ def speed_and_memory_test_full_day():
     time_start = time_profiling.time()
     traffic_data = get_traffic_city_service_hour(city=city, service=service, traffic_type=traffic_type)
     print('Traffic data loaded')
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=traffic_data, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=traffic_data, city=city, z_dim='time')
     print('Raster data created')
     vectors = gpd.read_parquet(vector_file_path)
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='time')
     zonal_stats.to_parquet(zonal_stats_ouput_file_path, index=False)
     print('Zonal statistics saved to', zonal_stats_ouput_file_path)
     time_end = time_profiling.time()
@@ -192,7 +192,7 @@ def speed_and_memory_test_full_day():
     print('Speed and memory test finished')
 
 
-def run_job_full_day():
+def run_job_tile_by_time_full_day():
     city = City(sys.argv[1])
     service = Service(sys.argv[2])
     traffic_type = TrafficType.UL_AND_DL
@@ -214,16 +214,22 @@ def run_job_full_day():
     traffic_data = get_traffic_city_service_hour(city=city, service=service, traffic_type=traffic_type)
     logger.info('Traffic data loaded')
     logger.info('Rasterizing traffic data')
-    raster = rasterize_traffic_city_service_by_tile_time(traffic_data=traffic_data, city=city)
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=traffic_data, city=city, z_dim='time')
     logger.info('Raster data created')
     logger.info('Zonal statistics computation started')
     vectors = gpd.read_parquet(vector_file_path)
-    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='time')
     logger.info('Zonal statistics computation finished')
     logger.info('Saving zonal statistics to %s', zonal_stats_output_file_path)
     zonal_stats.to_parquet(zonal_stats_output_file_path, index=False)
     logger.info('Zonal statistics saved to %s', zonal_stats_output_file_path)
     logger.info('@@ Zonal statistics job finished @@')
+
+
+@profile
+def speed_and_memory_service_by_day():
+    
+
 
 
 if __name__ == '__main__':

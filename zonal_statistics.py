@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 
 import geopandas as gpd
 import rasterio
@@ -7,26 +7,25 @@ import xarray as xr
 import rasterstats
 import shapely
 import pandas as pd
-from datetime import time
+from datetime import time, date
 
 from traffic_data.enums import City, Service
 
 
-def compute_zonal_statistics_traffic_raster_city_service(city: City, service: Service, traffic_raster: xr.DataArray, vectors: gpd.GeoDataFrame, vector_id_col: str, coverage_threshold: float) -> pd.DataFrame:
-    assert traffic_raster.ndim == 3, "The input raster must be 3D, i.e. it must correspond to the traffic for a specific city, service pairs. The dimensions should be y,x and time."
-    vectors = extract_vector_within_raster_coverage(raster=traffic_raster.isel(time=0), vector=vectors, coverage_threshold=coverage_threshold)
-    zonal_stats = [_get_zonal_statistics(c=city, s=service, t=t, raster=traffic_raster.sel(time=t), vectors=vectors, vector_id_col=vector_id_col) for t in traffic_raster.time.values]
+def compute_zonal_statistics_traffic_raster_city_service(city: City, service: Service, traffic_raster: xr.DataArray, vectors: gpd.GeoDataFrame, vector_id_col: str, coverage_threshold: float, z_dim: str) -> pd.DataFrame:
+    assert traffic_raster.ndim == 3, "The input raster must be 3D, i.e. it must correspond to the traffic for a specific city, service pairs. The dimensions should be y,x and z."
+    vectors = extract_vector_within_raster_coverage(raster=traffic_raster.isel(z_dim=0), vector=vectors, coverage_threshold=coverage_threshold)
+    zonal_stats = [_get_zonal_statistics(c=city, s=service, z=z, z_dim=z_dim, raster=traffic_raster.sel(z_dim=z), vectors=vectors, vector_id_col=vector_id_col) for z in traffic_raster[z_dim].values]
     zonal_stats = pd.concat(zonal_stats)
     return zonal_stats
 
-
-def _get_zonal_statistics(c: City, s: Service, t: time, raster: xr.DataArray, vectors: gpd.GeoDataFrame, vector_id_col: str) -> pd.DataFrame:
+def _get_zonal_statistics(c: City, s: Service, z: str, z_dim: str, raster: xr.DataArray, vectors: gpd.GeoDataFrame, vector_id_col: str) -> pd.DataFrame:
     zonal_stats = extract_zonal_stats(raster=raster, no_data=np.nan, vector=vectors, stats=['mean'], all_touched=True)
     zonal_stats['service'] = s.value
-    zonal_stats['time'] = t
+    zonal_stats[z_dim] = z
     zonal_stats['city'] = c.value
     zonal_stats.rename(columns={'mean_raster_value': 'traffic'}, inplace=True)
-    zonal_stats = zonal_stats[[vector_id_col, 'city', 'service', 'time', 'traffic']].copy()
+    zonal_stats = zonal_stats[[vector_id_col, 'city', 'service', z_dim, 'traffic']].copy()
     return zonal_stats
 
 

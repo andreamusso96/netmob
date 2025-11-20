@@ -29,13 +29,13 @@ def rasterize_points(gdf: gpd.GeoDataFrame, measurements: List[str], tile_size: 
     return raster
 
 
-def rasterize_traffic_city_service_by_tile_time(traffic_data: pd.DataFrame, city: City) -> xr.DataArray:
-    # Traffic data must have as index the tiles of a city and as columns the time of the day
+def rasterize_traffic_city_service_by_tile(traffic_data: pd.DataFrame, city: City, z_dim: str) -> xr.DataArray:
+    # Traffic data must have as index the tiles of a city and as columns the z_dim
     traffic_tile_geo = load_tile_geo_data_city(city).to_crs(epsg=2154)
     traffic_tile_geo['geometry'] = traffic_tile_geo['geometry'].centroid
     traffic_service_and_geo = gpd.GeoDataFrame(pd.merge(traffic_data, traffic_tile_geo, left_index=True, right_index=True))
     raster = rasterize_points(gdf=traffic_service_and_geo, measurements=list(traffic_data.columns), tile_size=100, no_data=np.nan, epsg=2154)
-    raster = raster.rename({'variable': 'time'})
-    # Here we do not transform the time values back into datetime objects because rioxarray (which is the type of the raster)
-    # has a bug when you make a copy of the dataarray (i.e., the transform is lost)
+    raster = raster.rename({'variable': z_dim})
+    # Be careful here that rioxarray (which is the type of the raster) has a bug when you make a copy of the dataarray (i.e., the transform is lost)
+    # So never make a copy of this raster
     return raster

@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def check_cluster_jobs():
-    dir_path = '/Users/andrea/Desktop/Temp/job_netmob_2025_11_11/'
+    dir_path = '/Users/andrea/Desktop/Temp/jobs_netmob_2025_11_12/'
     files = [f for f in os.listdir(dir_path) if f.endswith('.out')]
     job_names_not_finished = []
     for file in files:
@@ -14,6 +14,8 @@ def check_cluster_jobs():
                 if '@@ Zonal statistics job finished @@' in line:
                     finished = True
                     break
+
+
         if not finished:
             city_name = job_name.split('-')[2]
             service_name = job_name.split('-')[3]
@@ -22,6 +24,10 @@ def check_cluster_jobs():
                 'city': city_name,
                 'service': service_name
             })
+            with open(os.path.join(dir_path, file), 'r') as f:
+                for line in f:
+                    if 'OOM Killed' in line:
+                        job_names_not_finished[-1]['oom_killed'] = True
 
     job_names_not_finished = pd.DataFrame(job_names_not_finished)
     print(job_names_not_finished.head())
@@ -30,6 +36,7 @@ def check_cluster_jobs():
     print('Number of services not finished:', len(job_names_not_finished['service'].unique()))
     print('Cities not finished:', job_names_not_finished['city'].unique())
     print('Services not finished:', job_names_not_finished['service'].unique())
+    print('Number of jobs OOM Killed:', job_names_not_finished['oom_killed'].sum())
                 
 
 
