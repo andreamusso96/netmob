@@ -255,4 +255,4 @@ def speed_and_memory_service_by_day():
 
 
 if __name__ == '__main__':
-    run_job_full_day()
+    speed_and_memory_service_by_day()

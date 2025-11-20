@@ -8,14 +8,15 @@ import rasterstats
 import shapely
 import pandas as pd
 from datetime import time, date
+from tqdm import tqdm
 
 from traffic_data.enums import City, Service
 
 
 def compute_zonal_statistics_traffic_raster_city_service(city: City, service: Service, traffic_raster: xr.DataArray, vectors: gpd.GeoDataFrame, vector_id_col: str, coverage_threshold: float, z_dim: str) -> pd.DataFrame:
     assert traffic_raster.ndim == 3, "The input raster must be 3D, i.e. it must correspond to the traffic for a specific city, service pairs. The dimensions should be y,x and z."
-    vectors = extract_vector_within_raster_coverage(raster=traffic_raster.isel(z_dim=0), vector=vectors, coverage_threshold=coverage_threshold)
-    zonal_stats = [_get_zonal_statistics(c=city, s=service, z=z, z_dim=z_dim, raster=traffic_raster.sel(z_dim=z), vectors=vectors, vector_id_col=vector_id_col) for z in traffic_raster[z_dim].values]
+    vectors = extract_vector_within_raster_coverage(raster=traffic_raster.isel({z_dim: 0}), vector=vectors, coverage_threshold=coverage_threshold)
+    zonal_stats = [_get_zonal_statistics(c=city, s=service, z=z, z_dim=z_dim, raster=traffic_raster.sel({z_dim: z}), vectors=vectors, vector_id_col=vector_id_col) for z in tqdm(traffic_raster.coords[z_dim].values)]
     zonal_stats = pd.concat(zonal_stats)
     return zonal_stats
 
