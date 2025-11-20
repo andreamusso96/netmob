@@ -55,10 +55,8 @@ def convert_minutes(minutes):
 def run_cluster_jobs():
     ntasks = 1
     script_file_path = '/cluster/home/anmusso/Projects/NetMobV2/netmob/main.py'
-    # cities = [c for c in City]
-    # services = [s for s in Service]
-    cities = [City.PARIS]
-    services = [Service.FACEBOOK]
+    cities = [c for c in City]
+    services = [s for s in Service]
 
     for c in cities:
         for s in services:
@@ -74,4 +72,4 @@ def run_cluster_jobs():
 
 
 if __name__ == '__main__':
-    run_cluster_jobs()
+    print(get_city_runtime_and_mem_v2(c=City.PARIS))
