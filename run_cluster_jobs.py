@@ -36,6 +36,14 @@ def get_city_runtime_and_mem(c: City):
 
     return city_time_str, city_mem
 
+def get_city_runtime_and_mem_v2(c: City):
+    n_tiles = CityDimensions.get_city_dim(city=c)
+    time_precise = 0.04 * n_tiles
+    mem_precise = 512 + (0.24 * n_tiles)
+    time = int(np.ceil(1.5 * time_precise / 60)) # in minutes
+    mem = int(np.ceil(1.5 * mem_precise)) # in MB
+    return time, mem
+
 def convert_minutes(minutes):
     total_seconds = int(minutes * 60)
     hrs = total_seconds // 3600
@@ -46,14 +54,16 @@ def convert_minutes(minutes):
 def run_cluster_jobs():
     ntasks = 1
     script_file_path = '/cluster/home/anmusso/Projects/NetMobV2/netmob/main.py'
-    cities = [City.TOURS, City.NANCY]
-    services = [s for s in Service]
+    # cities = [c for c in City]
+    # services = [s for s in Service]
+    cities = [City.PARIS]
+    services = [Service.FACEBOOK]
 
     for c in cities:
         for s in services:
             logger.info(f"Submitting job for city {c.value} and service {s.value}")
             sbatch_output_file = f"slurm-aggr-{c.value.lower()}-{s.value.lower()}-%j.out"
-            run_time, mem_per_cpu = get_city_runtime_and_mem(c=c)
+            run_time, mem_per_cpu = get_city_runtime_and_mem_v2(c=c)
             cmd_args = [c.value, s.value]
             cmd = f"sbatch --time={run_time} --mem-per-cpu={mem_per_cpu} --ntasks={ntasks} --output={sbatch_output_file} --error={sbatch_output_file} --wrap='python {script_file_path} {' '.join(cmd_args)}'"
             result = subprocess.run(cmd, shell=True, text=True, capture_output=True)

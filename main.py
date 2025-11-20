@@ -198,7 +198,7 @@ def run_job_tile_by_time_full_day():
     service = Service(sys.argv[2])
     traffic_type = TrafficType.UL_AND_DL
 
-    vector_file_path = INSEE_TILE_GEO_DATA_FILE
+    vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vector_id_col = 'Idcar_200m'
     coverage_threshold = 0.8
     zonal_stats_output_file_path = f'/cluster/work/coss/anmusso/netmob/data/zonal_stats_full_day/insee_tile_v2/zonal_stats_{city.value}_{service.value}.parquet'
@@ -253,6 +253,37 @@ def speed_and_memory_service_by_day():
     print('Speed and memory test finished')
 
 
+def run_job_service_by_day():
+    city = City(sys.argv[1])
+    service = Service(sys.argv[2])
+    traffic_type = TrafficType.UL_AND_DL
+    vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
+    vector_id_col = 'Idcar_200m'
+    coverage_threshold = 0.8
+    zonal_stats_output_file_path = f'/cluster/work/coss/anmusso/netmob/data/zonal_stats_service_by_day/insee_tile_v2/zonal_stats_{city.value}_{service.value}.parquet'
+
+    logger = logging.getLogger(f'Logger_service_by_day_{city.value}_{service.value}')
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch = logging.StreamHandler()
+    ch.setFormatter(formatter)
+    logger.addHandler(ch)
+
+    logger.info('Starting zonal statistics job for city %s and service %s', city.value, service.value)
+    logger.info('Loading traffic data')
+    traffic_data = get_traffic_city_service_date(city=city, service=service, traffic_type=traffic_type)
+    logger.info('Traffic data loaded')
+    logger.info('Rasterizing traffic data')
+    raster = rasterize_traffic_city_service_by_tile(traffic_data=traffic_data, city=city, z_dim='date')
+    logger.info('Raster data created')
+    logger.info('Zonal statistics computation started')
+    vectors = gpd.read_parquet(vector_file_path)
+    zonal_stats = compute_zonal_statistics_traffic_raster_city_service(city=city, service=service, traffic_raster=raster, vectors=vectors, vector_id_col=vector_id_col, coverage_threshold=coverage_threshold, z_dim='date')
+    logger.info('Zonal statistics computation finished')
+    logger.info('Saving zonal statistics to %s', zonal_stats_output_file_path)
+    zonal_stats.to_parquet(zonal_stats_output_file_path, index=False)
+    logger.info('Zonal statistics saved to %s', zonal_stats_output_file_path)
+    logger.info('@@ Zonal statistics job finished @@')
 
 if __name__ == '__main__':
-    speed_and_memory_service_by_day()
+    run_job_service_by_day()
