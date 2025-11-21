@@ -25,19 +25,24 @@ def check_cluster_jobs():
                 'service': service_name
             })
             with open(os.path.join(dir_path, file), 'r') as f:
+                job_names_not_finished[-1]['oom_killed'] = False
+                job_names_not_finished[-1]['disk_quota_exceeded'] = False
                 for line in f:
                     if 'OOM Killed' in line:
                         job_names_not_finished[-1]['oom_killed'] = True
+                    if 'Disk quota exceeded' in line:
+                        job_names_not_finished[-1]['disk_quota_exceeded'] = True
 
     job_names_not_finished = pd.DataFrame(job_names_not_finished)
     print(job_names_not_finished.head())
+    print('Number of jobs', len(files))
     print('Number of jobs not finished:', len(job_names_not_finished))
     print('Number of cities not finished:', len(job_names_not_finished['city'].unique()))
     print('Number of services not finished:', len(job_names_not_finished['service'].unique()))
     print('Cities not finished:', job_names_not_finished['city'].unique())
     print('Services not finished:', job_names_not_finished['service'].unique())
     print('Number of jobs OOM Killed:', job_names_not_finished['oom_killed'].sum())
-                
+    print('Number of jobs Disk quota exceeded:', job_names_not_finished['disk_quota_exceeded'].sum())
 
 
 if __name__ == '__main__':
