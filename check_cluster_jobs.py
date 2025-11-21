@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def check_cluster_jobs():
-    dir_path = '/Users/andrea/Desktop/Temp/jobs_netmob_2025_11_12/'
+    dir_path = '/Users/andrea/Desktop/PhD/Projects/Current/NetMob/netmob/cluster_job_files/jobs_date_2025_11_21'
     files = [f for f in os.listdir(dir_path) if f.endswith('.out')]
     job_names_not_finished = []
     for file in files:

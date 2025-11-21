@@ -260,7 +260,7 @@ def run_job_service_by_day():
     vector_file_path = '/cluster/work/coss/anmusso/netmob/data/shape/insee_tile_geo.parquet'
     vector_id_col = 'Idcar_200m'
     coverage_threshold = 0.8
-    zonal_stats_output_file_path = f'/cluster/work/coss/anmusso/netmob/data/zonal_stats_service_by_day/insee_tile_v2/zonal_stats_{city.value}_{service.value}.parquet'
+    zonal_stats_output_file_path = f'/cluster/work/gess/coss/users/anmusso/netmob/zonal_stats_service_by_day/zonal_stats_{city.value}_{service.value}.parquet'
 
     logger = logging.getLogger(f'Logger_service_by_day_{city.value}_{service.value}')
     logger.setLevel(logging.DEBUG)
