@@ -1,6 +1,9 @@
 *.ipynb
-__pycache__/
 .DS_Store
 viz/
 test_data/
 cluster_job_files/
+data/
+mprofile_*
+__pycache__/
+traffic_data/__pycache__/

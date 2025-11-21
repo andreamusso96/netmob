@@ -27,6 +27,7 @@ def get_traffic_city_service_date(city: City, service: Service, traffic_type: Tr
     traffic_data_service = load_traffic_data_city(traffic_type=traffic_type, city=city, service=[service], day=TimeOptions.get_days())
     traffic_data_service = day_time_to_datetime_index(xar=traffic_data_service)
     traffic_data_service = traffic_data_service.squeeze('service').to_pandas().T.reset_index()
+    traffic_data_service = traffic_data_service[(traffic_data_service['datetime'].dt.time < time(6)) | (traffic_data_service['datetime'].dt.time >= time(21))]
     traffic_data_service['date'] = (traffic_data_service['datetime'] - pd.Timedelta(hours=6)).dt.date
     traffic_data_service = traffic_data_service.drop(columns=['datetime'])
     traffic_data_service = traffic_data_service.groupby('date').sum().T

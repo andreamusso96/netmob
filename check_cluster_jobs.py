@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def check_cluster_jobs():
-    dir_path = '/Users/andrea/Desktop/PhD/Projects/Current/NetMob/netmob/cluster_job_files/jobs_date_2025_11_21'
+    dir_path = '/Users/andrea/Desktop/PhD/Projects/Current/NetMob/netmob/cluster_job_files/jobs_date_2025_11_21_v2'
     files = [f for f in os.listdir(dir_path) if f.endswith('.out')]
     job_names_not_finished = []
     for file in files:
@@ -36,13 +36,16 @@ def check_cluster_jobs():
     job_names_not_finished = pd.DataFrame(job_names_not_finished)
     print(job_names_not_finished.head())
     print('Number of jobs', len(files))
-    print('Number of jobs not finished:', len(job_names_not_finished))
-    print('Number of cities not finished:', len(job_names_not_finished['city'].unique()))
-    print('Number of services not finished:', len(job_names_not_finished['service'].unique()))
-    print('Cities not finished:', job_names_not_finished['city'].unique())
-    print('Services not finished:', job_names_not_finished['service'].unique())
-    print('Number of jobs OOM Killed:', job_names_not_finished['oom_killed'].sum())
-    print('Number of jobs Disk quota exceeded:', job_names_not_finished['disk_quota_exceeded'].sum())
+    if len(job_names_not_finished) > 0:
+        print('Number of jobs not finished:', len(job_names_not_finished))
+        print('Number of cities not finished:', len(job_names_not_finished['city'].unique()))
+        print('Number of services not finished:', len(job_names_not_finished['service'].unique()))
+        print('Cities not finished:', job_names_not_finished['city'].unique())
+        print('Services not finished:', job_names_not_finished['service'].unique())
+        print('Number of jobs OOM Killed:', job_names_not_finished['oom_killed'].sum())
+        print('Number of jobs Disk quota exceeded:', job_names_not_finished['disk_quota_exceeded'].sum())
+    else:
+        print('All jobs finished')
 
 
 if __name__ == '__main__':
